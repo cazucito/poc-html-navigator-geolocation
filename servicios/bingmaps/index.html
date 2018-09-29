@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>||PoC|HTML|&gt;navigator.geolocation&gt;Bing Maps||</title>
+  <meta name="author:cazucito" content="cazucito">
+  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon" />
+</head>
+<body>
+  <h1>Bing Maps: Ejemplo simple</h1>
+  <h2>Localización Pirámide de la Luna (19.6987669,-98.8455638)</h2>
+  <figure>
+    <img id="luna" />
+    <figcaption>Pirámide de la Luna</figcaption>
+  </figure>
+  <h2>Localización Cliente</h2>
+  <figure>
+    <img id="cliente" />
+    <figcaption>Localización Cliente</figcaption>
+  </figure>
+  <button onclick="obtenerLocalizacionCliente()">Obten Localización</button>
+  <script>
+    ////////////////////////////////////////////////////////////////////////////
+    // PLATAFORMA BING MAPS
+    // Obtención de las llaves en:
+    // http://www.microsoft.com/maps/create-a-bing-maps-key.aspx
+    // DOCUMENTACIÓN
+    // https://msdn.microsoft.com/en-us/library/ff701724.aspx
+    // Opción JavaScript/REST
+    // https://dev.virtualearth.net/REST/v1/Imagery/Map/imagerySet/centerPoint/zoomLevel?mapSize={mapSize}&pushpin={pushpin}&mapLayer={mapLayer}&format={format}&mapMetadata={mapMetadata}&key={key}
+    // Configuracion de la imagen a obtener
+    // Llave de desarrollador
+    const BING_MAPS_KEY = "AkBGelxPjXQA7pEi2rqdNdG-tT4wu-Dy3ZOWX7EO0oTmAW0otmy_5NMM92okpn0n";
+    // Tamaño de la imagen
+    const MAP_SIZE = "400,400";
+    // Localización por defecto (Pirámide de la luna Teotihuacan)
+    const DEFAULT_LOCALIZATION = "19.6987669,-98.8455638";
+    // Capas del mapa
+    const MAP_LAYER = "TrafficFlow";
+    // Formato de la imagen (gif, jpeg & png)
+    const FORMAT = "jpeg";
+    // Con o sin metadata (por defecto 0)
+    const MAP_METADATA = 0;
+    // URL con el endpoint del servicio web rest
+    const URL_REST = "https://dev.virtualearth.net/REST/v1/Imagery/Map/AerialWithLabels?mapSize="
+                    + MAP_SIZE + "&pushpin=" + DEFAULT_LOCALIZATION + "&mapLayer=" + MAP_LAYER
+                    + "&format=" + FORMAT + "&mapMetadata=" + MAP_METADATA + "&key=" + BING_MAPS_KEY;
+    // Obtención del nodo image para mostrar la imagen descargada del servicio
+    var nodoImg = document.getElementById("luna");
+    // Creación del objeto image para 'dibujar' en el la imagen obtenida
+    var imagenDescargada = new Image();
+    // Evento asíncrono para cargar los datos de la imagen
+    imagenDescargada.onload = function() {
+      nodoImg.src = this.src;
+    };
+    // Obtención (desde el servicio) y asociación de la imagen
+    imagenDescargada.src = URL_REST;
+    // Obtención del punto de localizacion del cliente que oprime el botón
+    function obtenerLocalizacionCliente() {
+      if (navigator.geolocation) {
+        // De ser exitoso se ejecuta la función muestraLocalizacionEnMapa
+        navigator.geolocation.getCurrentPosition(muestraLocalizacionEnMapa);
+      } else {
+        // Mensaje de alerta de no poseer servicio de localización
+        alert("Objeto 'navigator.geolocation' no soportado por su navegador.");
+      }
+    }
+    // Carga la imgen con los datos obtenidos del objeto position pasado como
+    // parámetro
+    function muestraLocalizacionEnMapa(position) {
+      // Obtención del nodo image para mostrar la imagen descargada del servicio
+      var nodoImg = document.getElementById("cliente");
+    // Creación del objeto image para 'dibujar' en el la imagen obtenida
+      var imagenDescargada = new Image();
+      // Evento asíncrono para cargar los datos de la imagen
+      imagenDescargada.onload = function() {
+        nodoImg.src = this.src;
+      };
+      // Creación de una cadena con los datos de localización del cliente
+      var localizacionCliente = position.coords.latitude + "," + position.coords.longitude;
+      // URL con el endpoint del servicio web rest
+      var usrCliente = "https://dev.virtualearth.net/REST/v1/Imagery/Map/AerialWithLabels?mapSize="
+                      + MAP_SIZE + "&pushpin=" + localizacionCliente + "&mapLayer="
+                      + MAP_LAYER + "&format=" + FORMAT + "&mapMetadata=" + MAP_METADATA
+                      + "&key=" + BING_MAPS_KEY;
+      // Obtención (desde el servicio) y asociación de la imagen
+      imagenDescargada.src = usrCliente;
+    }
+  </script>
+</body>
+
+</html>
